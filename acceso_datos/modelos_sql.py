@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Float, DateTime
-from .db_conexion import Base
+from infraestructura.db_conexion import Base
 import datetime
 
 class LlamadaSQL(Base):
