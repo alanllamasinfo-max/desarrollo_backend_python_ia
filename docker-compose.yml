@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Base de Datos
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: callcenter_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Servidor de Mensajes (RabbitMQ)
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_broker
+    restart: always
+    ports:
+      - "5672:5672"   # Puerto de datos
+      - "15672:15672" # Panel de control web
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  # Nuestra Aplicación FastAPI
+  api:
+    build: .
+    container_name: reception_api
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/callcenter_db
+    depends_on:
+      - db
+      - rabbitmq
+
+volumes:
+  postgres_data:
