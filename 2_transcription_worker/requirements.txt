@@ -1,0 +1,6 @@
+openai-whisper
+pika
+sqlalchemy
+psycopg2-binary
+python-dotenv
+setuptools

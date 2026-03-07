@@ -1,7 +1,7 @@
-version: '3.8'
+#version: '3.8'
 
 services:
-  # Base de Datos
+  #1. Base de Datos
   db:
     image: postgres:15
     container_name: db_callcenter
@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # Servidor de Mensajes (RabbitMQ)
+  #2. Servidor de Mensajes (RabbitMQ)
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq_broker
@@ -27,7 +27,7 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
-  # Nuestra Aplicación FastAPI, podemos acceder a http://localhost:8000/docs#/default/recibir_audio_subir_audio_post para probar la API
+  #3. Nuestra Aplicación FastAPI, podemos acceder a http://localhost:8000/docs#/default/recibir_audio_subir_audio_post para probar la API
   api:
     build: .
     container_name: reception_api
@@ -40,6 +40,18 @@ services:
     depends_on:
       - db
       - rabbitmq
+  #4. Microservicio: IA (Worker)
+  ia_worker:
+    build: ./2_transcription_worker
+    container_name: ia_worker_whisper
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - ./audios:/app/audios  # Compartimos la carpeta de audios entre servicios
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/callcenter_db
+      - RABBITMQ_HOST=rabbitmq
 
 volumes:
   postgres_data:

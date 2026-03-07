@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime
+from sqlalchemy import Column, String, Float, DateTime, Text
 from infraestructura.db_conexion import Base
 import datetime
 
@@ -9,4 +9,5 @@ class LlamadaSQL(Base):
     nombre_archivo = Column(String)
     tamano_kb = Column(Float)
     estado = Column(String, default="recibido")
+    transcripcion = Column(Text, nullable=True)
     fecha_creacion = Column(DateTime, default=datetime.datetime.utcnow)
