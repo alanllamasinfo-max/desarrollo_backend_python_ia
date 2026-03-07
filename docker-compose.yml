@@ -4,7 +4,7 @@ services:
   # Base de Datos
   db:
     image: postgres:15
-    container_name: postgres_db
+    container_name: db_callcenter
     restart: always
     environment:
       POSTGRES_USER: user
