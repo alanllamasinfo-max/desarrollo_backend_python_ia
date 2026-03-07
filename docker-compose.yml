@@ -22,12 +22,12 @@ services:
     restart: always
     ports:
       - "5672:5672"   # Puerto de datos
-      - "15672:15672" # Panel de control web
+      - "15672:15672" # Panel de control web , podemos acceder a http://localhost:15672 con usuario "guest" y contraseña "guest"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
-  # Nuestra Aplicación FastAPI
+  # Nuestra Aplicación FastAPI, podemos acceder a http://localhost:8000/docs#/default/recibir_audio_subir_audio_post para probar la API
   api:
     build: .
     container_name: reception_api
