@@ -29,10 +29,10 @@ services:
 
   #3. Nuestra Aplicación FastAPI, podemos acceder a http://localhost:8000/docs#/default/recibir_audio_subir_audio_post para probar la API
   api:
-    build: .
+    build: ./1_reception_api
     container_name: reception_api
     volumes:
-      - .:/app
+      - ./1_reception_api:/app
     ports:
       - "8000:8000"
     environment:

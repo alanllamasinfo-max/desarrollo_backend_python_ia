@@ -11,11 +11,16 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     git \
+    gcc \
+    build-essential \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Instalamos las librerías de Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+#---RUN pip install --upgrade pip && \
+#---    pip install --no-cache-dir -r requirements.txt
 
 # 3. Pre-descargamos el modelo Whisper "base" 
 # Esto evita que el contenedor lo baje en cada reinicio

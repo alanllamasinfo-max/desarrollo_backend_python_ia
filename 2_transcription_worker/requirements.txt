@@ -1,6 +1,7 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
 openai-whisper
 pika
 sqlalchemy
 psycopg2-binary
 python-dotenv
-setuptools
