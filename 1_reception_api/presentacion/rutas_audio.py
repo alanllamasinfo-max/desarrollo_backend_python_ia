@@ -21,7 +21,7 @@ async def recibir_audio(archivo: UploadFile = File(...), db: Session = Depends(g
     try:
         gestor = GestorLlamadas(db)
         resultado = await gestor.procesar_llamada(archivo)
-        
+        print(f"INFO: Procesada llamada {resultado.id_llamada} exitosamente") # ESTO ES LO QUE LEE FILEBEAT
         return {
             "mensaje": "Audio recibido y en cola de transcripción",
             "llamada": resultado

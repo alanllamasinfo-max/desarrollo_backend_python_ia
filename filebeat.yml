@@ -1,0 +1,20 @@
+filebeat.inputs:
+- type: container
+  paths:
+    - /var/lib/docker/containers/*/*.log
+
+processors:
+- add_docker_metadata: ~
+#- decode_json_fields:
+#        fields: ["message"]
+#        target: "json"
+#        overwrite_keys: true
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  index: "filebeat-logs-%{+yyyy.MM.dd}"
+
+# Esto es necesario cuando definimos un índice personalizado
+setup.template.name: "filebeat-logs"
+setup.template.pattern: "filebeat-logs-*"
+setup.ilm.enabled: false
