@@ -1,46 +1,42 @@
 import os
 import shutil
+import uuid
 from acceso_datos.repositorio_llamadas import RepositorioLlamadas
 from infraestructura.rabbitmq_cliente import RabbitMQCliente
-import uuid
 
 class GestorLlamadas:
-    def __init__(self):
-        self.repo = RepositorioLlamadas()
+    def __init__(self, db_session):
+        self.repo = RepositorioLlamadas(db_session)
         self.rabbit = RabbitMQCliente()
-        # Ruta dentro del contenedor (mapeada al volumen compartido)
+        self.db = db_session
         self.ruta_almacen = "/app/audios"
-
-    def procesar_llamada(self, archivo_raw, db):
-        # 0. Asegurar que la carpeta existe
+        
+    async def procesar_llamada(self, archivo_raw):
         if not os.path.exists(self.ruta_almacen):
             os.makedirs(self.ruta_almacen)
-
-        # 1. Generar identidad de la llamada
+        
         id_llamada = str(uuid.uuid4())
         nombre_archivo = f"{id_llamada}_{archivo_raw.filename}"
         ruta_final = os.path.join(self.ruta_almacen, nombre_archivo)
-
-        # 2. GUARDADO FÍSICO (El archivo pasa del navegador al disco)
+        
         with open(ruta_final, "wb") as buffer:
             shutil.copyfileobj(archivo_raw.file, buffer)
-
-        # 3. Guardar en Base de Datos
-        # Calculamos el tamaño en KB para el registro
+        
         tamano_kb = os.path.getsize(ruta_final) / 1024
         
-        nueva_llamada = self.repo.crear_llamada(
-            db, 
-            id_llamada=id_llamada, 
-            archivo=nombre_archivo, 
-            tamano=tamano_kb
-        )
-
-        # 4. Notificar al Worker de IA vía RabbitMQ
+        datos = {
+            "id_llamada": id_llamada,
+            "nombre_archivo": nombre_archivo,
+            "tamano_kb": tamano_kb,
+            "estado": "recibido"
+        }
+        
+        nueva_llamada = self.repo.guardar_llamada(datos)
+        
         mensaje = {
             "id_llamada": id_llamada,
             "archivo": nombre_archivo
         }
-        self.rabbit.enviar_mensaje("cola_transcripcion", mensaje)
-
+        self.rabbit.enviar_mensaje(mensaje)
+        
         return nueva_llamada
